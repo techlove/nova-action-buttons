@@ -38,7 +38,9 @@ class ActionButton extends Field
     public function action(Action $action, mixed $resourceId): self
     {
         return $this->withMeta([
-            'action' => $action,
+            'actionUriKey' => $action->uriKey(),
+            'showOnIndex' => $action->showOnIndex,
+            'showOnDetail' => $action->showOnDetail,
             'resourceId' => $resourceId,
         ]);
     }

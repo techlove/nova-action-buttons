@@ -3,7 +3,7 @@
         <template v-slot:value>
             <div class="flex items-center ">
                 <template v-for="(action) in actions" :key="action.key">
-                    <action-button v-bind="action"/>
+                    <detail-action-button v-bind="action"/>
                 </template>
             </div>
         </template>
@@ -28,7 +28,7 @@
     // Computed
     const collection = computed(() => props?.field?.collection || []);
     const actions = computed(() => (collection?.value || [])
-        .filter((field) => field.action.showOnDetail)
+        .filter((field) => field.showOnDetail)
         .map((field, i) => ({
             field: field,
             queryString: props?.queryString,

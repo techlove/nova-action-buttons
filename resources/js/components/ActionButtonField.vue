@@ -5,8 +5,16 @@
             <span v-if="icon && !iconIsUrl" v-html="icon" />
             <img v-if="icon && iconIsUrl" :src="icon" class="w-6 h-6 inline"  />
         </a>
+        <modal
+            v-bind="options"
+            :show="loadingModal && selectedAction === null"
+            role="dialog"
+            :use-focus-trap="true"
+        >
+            <Loader class="text-gray-300" width="30" />
+        </modal>
         <component
-            v-if="confirmActionModalOpened"
+            v-if="confirmActionModalOpened && selectedAction !== null"
             v-bind="options"
             class="text-left"
             :is="selectedAction.component"
@@ -76,8 +84,10 @@
         ]
     })
 
+    const selectedActionUriKey = computed(() => props?.field?.actionUriKey);
+
     const queryString = computed(() => ({
-        action: selectedAction?.value?.uriKey,
+        action: selectedActionUriKey?.value,
         search: props?.queryString?.currentSearch,
         filters: props?.queryString?.encodedFilters,
         trashed: props?.queryString?.currentTrashed,
@@ -85,8 +95,6 @@
         viaResourceId: props?.queryString?.viaResourceId,
         viaRelationship: props?.queryString?.viaRelationship,
     }));
-
-    const selectedAction = computed(() => props?.field?.action);
 
     const selectedResources = computed(() => [props?.field?.resourceId]);
 
@@ -97,13 +105,16 @@
         fireAction,
         executeAction,
         closeConfirmationModal,
-        confirmActionModalOpened
+        confirmActionModalOpened,
+        action: selectedAction,
+        loadingModal
     } = useHandleAction(
         {
             queryString: queryString.value,
             resourceName: props?.resourceName,
-            selectedAction: selectedAction.value,
+            selectedAction: selectedActionUriKey.value,
             selectedResources: selectedResources.value,
+            isDetail: false
         }
     )
 
@@ -111,7 +122,7 @@
     const options = computed(() => ({
         show: true,
         errors: errors?.value,
-        action: selectedAction?.value,
+        action: selectedAction?.value ?? selectedActionUriKey?.value,
         working: working?.value === true,
         resourceName: props?.resourceName,
         selectedResources: selectedResources?.value,

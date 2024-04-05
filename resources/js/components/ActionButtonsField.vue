@@ -25,7 +25,7 @@
     // Computed
     const collection = computed(() => props?.field?.collection || []);
     const actions = computed(() => (collection?.value || [])
-        .filter((field) => field.action.showOnIndex)
+        .filter((field) => field.showOnIndex)
         .map((field, i) => ({
             field: field,
             queryString: props?.queryString,

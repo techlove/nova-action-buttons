@@ -5,12 +5,14 @@ import isNil from 'lodash/isNil'
 import {ref} from "vue";
 import {Errors} from 'form-backend-validation'
 
-export const useHandleAction = ({queryString, resourceName, selectedAction, selectedResources}) => {
+export const useHandleAction = ({queryString, resourceName, selectedAction, selectedResources, isDetail}) => {
 
     // State
     const errors = ref(new Errors());
     const working = ref(false);
+    const loadingModal = ref(false);
     const confirmActionModalOpened = ref(false);
+    const action = ref(null);
 
     const __ = (key) => Nova?.appConfig?.translations?.[key] || key;
 
@@ -20,9 +22,38 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
      * @return {void}
      */
     const fireAction = () => {
-        selectedAction?.withoutConfirmation === true
-            ? executeAction()
-            : openConfirmationModal()
+        const timeout = setTimeout(() => {
+            loadingModal.value = true;
+        }, 150);
+        Nova.request(
+            {
+                url: `/nova-api/${resourceName}/action`,
+                method: 'get',
+                params: {
+                    action: queryString?.action,
+                    search: queryString?.search,
+                    filters: queryString?.filters,
+                    trashed: queryString?.trashed,
+                    pivotAction: queryString?.pivotAction,
+                    viaResource: queryString?.viaResource,
+                    viaResourceId: queryString?.viaResourceId,
+                    viaRelationship: queryString?.viaRelationship,
+                }
+            }
+        ).then(response => {
+            loadingModal.value = false;
+            action.value = response.data;
+            if (response.data.withoutConfirmation === true) {
+                executeAction();
+            } else {
+                openConfirmationModal()
+            }
+        }).catch(() => {
+            Nova.error(__('There was a problem executing the action.'));
+        }).finally(() => {
+            clearTimeout(timeout);
+            loadingModal.value = false;
+        });
     }
 
 
@@ -42,6 +73,7 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
      * @return {void}
      */
     const closeConfirmationModal = () => {
+        action.value = null;
         confirmActionModalOpened.value = false
     }
 
@@ -120,7 +152,7 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
     const _actionFormData = () => {
         return tap(new FormData(), formData => {
             formData.append('resources', selectedResources)
-            each(selectedAction?.fields, field => {
+            each(action?.value?.fields, field => {
                 field.fill(formData)
             })
         })
@@ -136,7 +168,12 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
     const _emitResponseCallback = (callback) => {
 
         Nova.$emit('action-executed')
-        Nova.$emit('refresh-resources')
+        console.log('isDetail', isDetail);
+        if (isDetail) {
+            Nova.$emit('refresh-detail')
+        } else {
+            Nova.$emit('refresh-resources')
+        }
 
         if (typeof callback === 'function') {
             callback()
@@ -226,6 +263,8 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
         fireAction,
         executeAction,
         closeConfirmationModal,
-        confirmActionModalOpened
+        confirmActionModalOpened,
+        loadingModal,
+        action
     }
 }
