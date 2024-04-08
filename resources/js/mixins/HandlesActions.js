@@ -168,7 +168,6 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
     const _emitResponseCallback = (callback) => {
 
         Nova.$emit('action-executed')
-        console.log('isDetail', isDetail);
         if (isDetail) {
             Nova.$emit('refresh-detail')
         } else {

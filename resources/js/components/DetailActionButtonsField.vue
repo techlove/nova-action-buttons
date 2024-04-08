@@ -1,7 +1,7 @@
 <template>
     <panel-item :field="field">
         <template v-slot:value>
-            <div class="flex items-center ">
+            <div class="flex items-center gap-2 flex-wrap">
                 <template v-for="(action) in actions" :key="action.key">
                     <detail-action-button v-bind="action"/>
                 </template>
