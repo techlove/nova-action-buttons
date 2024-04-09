@@ -25,6 +25,13 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
         const timeout = setTimeout(() => {
             loadingModal.value = true;
         }, 150);
+        let extraParams = {};
+        if (selectedResources && selectedResources.length === 1) {
+            extraParams = {
+                resourceId: selectedResources[0],
+                resource: resourceName
+            };
+        }
         Nova.request(
             {
                 url: `/nova-api/${resourceName}/action`,
@@ -38,6 +45,8 @@ export const useHandleAction = ({queryString, resourceName, selectedAction, sele
                     viaResource: queryString?.viaResource,
                     viaResourceId: queryString?.viaResourceId,
                     viaRelationship: queryString?.viaRelationship,
+                    resources: selectedResources,
+                    ...extraParams
                 }
             }
         ).then(response => {
