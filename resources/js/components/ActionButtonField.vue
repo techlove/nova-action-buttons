@@ -3,7 +3,7 @@
         <a href="#" :style="finalStyles" :class="finalClasses" :title="name" @click.stop.prevent="fireAction">
             <span v-if="text" v-text="text"/>
             <span v-if="icon && !iconIsUrl" v-html="icon" />
-            <img v-if="icon && iconIsUrl" :src="icon" class="w-6 h-6 inline"  />
+            <img v-if="icon && iconIsUrl" :src="icon" class="w-10 h-7 inline" style="min-width: 24px;"  />
         </a>
         <modal
             v-bind="options"
@@ -51,10 +51,10 @@
     const actionButtonClasses = computed(() => [
         'flex-shrink-0', 'shadow', 'rounded', 'focus:outline-none', 'ring-primary-200', 'dark:ring-gray-600',
         'focus:ring', 'bg-primary-500', 'hover:bg-primary-400', 'active:bg-primary-600',
-        'text-white', 'dark:text-gray-800', 'inline-flex', 'items-center', 'font-bold', 'px-2', 'mx-1', 'h-9', 'text-sm', 'flex-shrink-0',
+        'text-white', 'dark:text-gray-800', 'inline-flex', 'items-center', 'font-bold', 'px-2', 'mx-1', 'h-9','text-sm', 'flex-shrink-0',
     ])
     const toolbarButtonClasses = computed(() => [
-        'toolbar-button', 'hover:text-primary-500', 'px-2', 'v-popper--has-tooltip', 'w-10'
+        'toolbar-button', 'hover:text-primary-500', 'px-0', 'v-popper--has-tooltip', 'w-10', 'h-7', 'mr-2'
     ])
 
     // Computed
